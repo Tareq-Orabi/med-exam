@@ -35,6 +35,14 @@ export function createPublicSupabaseClient(): SupabaseClient {
  */
 export function assertQuerySucceeded(error: { message: string } | null, queryName: string): void {
   if (error) {
+    if (
+      process.env.NODE_ENV === 'development' &&
+      (process.env.NEXT_PUBLIC_SUPABASE_URL?.includes('placeholder') ||
+        error.message?.includes('fetch failed'))
+    ) {
+      console.warn(`[Supabase dev warning] ${queryName}: ${error.message}`)
+      return
+    }
     throw new Error(`Supabase query failed (${queryName}): ${error.message}`)
   }
 }
